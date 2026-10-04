@@ -371,18 +371,19 @@ function createFromPicked(){
   const occ=eventsOnDate(S.selDate),chosen=S.picked.map(i=>occ[i]).filter(Boolean);
   if(!chosen.length)return;
   const name=chosen.map(o=>o.n).join(" & ");
-  const t=$("cf-time").value||"13:00",venue=$("cf-venue").value.trim()||"Masjid, Main Hall",meal=$("cf-meal").value.trim()||"Lunch";
+  const dv=$("cf-date").value,t=$("cf-time").value||"13:00",venue=$("cf-venue").value.trim()||"Masjid, Main Hall",meal=$("cf-meal").value.trim()||"Lunch";
+  if(!dv){toast("Please choose the date the jaman is actually held");return}
   const [hh,mm]=t.split(":").map(Number);
-  const start=new Date(S.selDate);start.setHours(hh,mm,0,0);
+  const start=new Date(dv+"T00:00:00");start.setHours(hh,mm,0,0);
   const id=nextId++;
   evs.push({id,name,venue,meal,start:start.getTime(),src:"calendar"});
   resp[id]={};actual[id]=null;S.picked=[];S.ev=id;render();toast("Jaman event created");
 }
 function createCustom(){
-  const name=$("cu-name").value.trim(),t=$("cu-time").value,venue=$("cu-venue").value.trim(),meal=$("cu-meal").value.trim();
-  if(!name||!t||!venue){toast("Please fill in name, time and venue");return}
+  const name=$("cu-name").value.trim(),dv=$("cu-date").value,t=$("cu-time").value,venue=$("cu-venue").value.trim(),meal=$("cu-meal").value.trim();
+  if(!name||!dv||!t||!venue){toast("Please fill in name, date, time and venue");return}
   const [hh,mm]=t.split(":").map(Number);
-  const start=new Date(S.selDate);start.setHours(hh,mm,0,0);
+  const start=new Date(dv+"T00:00:00");start.setHours(hh,mm,0,0);
   const id=nextId++;
   evs.push({id,name,venue,meal:meal||"—",start:start.getTime(),src:"custom"});
   resp[id]={};actual[id]=null;S.showCustom=false;S.ev=id;render();toast("Custom event created");
@@ -434,10 +435,13 @@ function dayPanel(){
     :`<p class="mute">No occasions from the Fatemi calendar fall on ${dt(S.selDate)}.</p>`;
   const occCard=card(`Occasions on ${dt(S.selDate)}`,occBody);
 
+  const selISO=new Date(S.selDate).toISOString().slice(0,10);
   const pickedForm=S.picked.length?card("Create jaman event",`
 <p class="mute sm">Creating a jaman for: <b>${S.picked.map(i=>occ[i]?.n).filter(Boolean).join(" & ")}</b></p>
-<div class="row"><div><label for="cf-time">Time</label><input type="time" id="cf-time" value="13:00"></div>
-<div><label for="cf-venue">Venue</label><input type="text" id="cf-venue" placeholder="Masjid, Main Hall"></div></div>
+<p class="mute sm">The jaman isn't always held on the occasion's own date — adjust it below if it's the day before or after.</p>
+<div class="row"><div><label for="cf-date">Date</label><input type="date" id="cf-date" value="${selISO}"></div>
+<div><label for="cf-time">Time</label><input type="time" id="cf-time" value="13:00"></div></div>
+<label for="cf-venue" style="margin-top:10px">Venue</label><input type="text" id="cf-venue" placeholder="Masjid, Main Hall">
 <label for="cf-meal" style="margin-top:10px">Meal</label><input type="text" id="cf-meal" placeholder="Lunch / Dinner / Niyaz">
 <p style="margin-top:12px"><button class="p" onclick="createFromPicked()">Create jaman event</button></p>`):"";
 
@@ -445,8 +449,9 @@ function dayPanel(){
   const customForm=S.showCustom?card("Custom event",`
 <p class="mute sm">For a majlis, guest lecture, or anything not on the Fatemi calendar.</p>
 <label for="cu-name">Event name</label><input type="text" id="cu-name" placeholder="e.g. Hafiz-ul-Quran Majlis">
-<div class="row" style="margin-top:10px"><div><label for="cu-time">Time</label><input type="time" id="cu-time"></div>
-<div><label for="cu-venue">Venue</label><input type="text" id="cu-venue" placeholder="Masjid, Main Hall"></div></div>
+<div class="row" style="margin-top:10px"><div><label for="cu-date">Date</label><input type="date" id="cu-date" value="${selISO}"></div>
+<div><label for="cu-time">Time</label><input type="time" id="cu-time"></div></div>
+<label for="cu-venue" style="margin-top:10px">Venue</label><input type="text" id="cu-venue" placeholder="Masjid, Main Hall">
 <label for="cu-meal" style="margin-top:10px">Meal (optional)</label><input type="text" id="cu-meal" placeholder="Lunch / Dinner / Niyaz — leave blank if none">
 <p style="margin-top:12px"><button class="p" onclick="createCustom()">Create event</button></p>`):"";
 
