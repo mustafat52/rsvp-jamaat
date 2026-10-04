@@ -33,7 +33,7 @@ header .in{max-width:780px;margin:0 auto;padding:12px 16px;display:flex;justify-
 .tabs button{background:none;border:none;color:var(--gold2);font-weight:700;font-size:13px;letter-spacing:.03em;text-transform:uppercase;padding:6px 10px;cursor:pointer;border-bottom:3px solid transparent}
 .tabs button[aria-pressed="true"]{color:#fff;border-bottom-color:var(--gold)}
 .datebar{background:var(--card);border-bottom:1px solid var(--line);padding:7px 16px;font-size:12.5px;color:var(--mute)}
-.datebar .in{max-width:780px;margin:0 auto;display:flex;justify-content:space-between}
+.datebar .in{max-width:780px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 10px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:8px;margin-bottom:12px;overflow:hidden}
 .band{background:var(--navy);background-image:repeating-linear-gradient(135deg,rgba(255,255,255,.04) 0 2px,transparent 2px 14px);color:var(--gold2);font-weight:800;text-transform:uppercase;letter-spacing:.05em;font-size:12.5px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .band span.t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -75,12 +75,12 @@ label{font-weight:700;font-size:13px;display:block;margin-bottom:4px}
 .gap-up{color:var(--bad)}.gap-down{color:var(--ok)}
 .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .cal .dow{text-align:center;font-size:11px;color:var(--mute);font-weight:700;padding:4px 0}
-.cal .day{aspect-ratio:1;border:1px solid var(--line);border-radius:6px;padding:4px;font-size:12px;cursor:pointer;background:var(--bg);display:flex;flex-direction:column;gap:2px;min-height:42px}
+.cal .day{border:1px solid var(--line);border-radius:6px;padding:4px 2px;font-size:12px;cursor:pointer;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:50px}
 .cal .day.pad{visibility:hidden}
 .cal .day.sel{border-color:var(--gold);border-width:2px;background:var(--soft)}
 .cal .day.today{box-shadow:inset 0 0 0 1px var(--navy)}
 .cal .dn{font-weight:700}
-.cal .hj{font-size:9.5px;color:var(--tan);font-weight:600}
+.cal .hj{font-size:9.5px;color:var(--tan);font-weight:600;white-space:nowrap}
 .cal .dots{display:flex;gap:2px;flex-wrap:wrap}
 .dot{width:6px;height:6px;border-radius:50%}
 .dot-cal{background:var(--gold)}.dot-cu{background:var(--tan)}
@@ -89,6 +89,33 @@ label{font-weight:700;font-size:13px;display:block;margin-bottom:4px}
 .cookday{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
 .cookday:last-child{border-bottom:none}
 hr.div{border:none;border-top:1px solid var(--line);margin:12px 0}
+
+/* ---- Mobile hardening ---- */
+@media (max-width:480px){
+  .wrap{padding:12px}
+  header .in{padding:10px 12px}
+  .brand b{font-size:15px}
+  .brand small{font-size:10px}
+  .tabs button{padding:5px 8px;font-size:11.5px}
+  .datebar{padding:6px 12px;font-size:11.5px}
+  .cal{gap:3px}
+  .cal .day{min-height:44px;padding:3px 1px}
+  .cal .dn{font-size:13px}
+  .cal .hj{font-size:8.5px}
+  .big{font-size:32px}
+  .heroin{margin-top:-24px;padding:22px 16px 18px}
+  .band{font-size:11.5px;padding:9px 12px}
+  h2{font-size:18px}
+}
+@media (max-width:380px){
+  .row>*{min-width:100%}
+  .stats{grid-template-columns:1fr 1fr}
+  .cal .day{min-height:40px}
+  .cal .dn{font-size:12px}
+  .cal .hj{font-size:8px}
+}
+/* Prevent any accidental horizontal scroll on small viewports */
+html,body{overflow-x:hidden}
 </style>
 </head>
 <body>
@@ -248,15 +275,16 @@ add(11,18,"Eid e Gadheer e Khum (Rozu)");
 add(11,27,"Urs Mubarak, 48th al-Dai al-Mutlaq Syedna Abdulhusain Husamuddin bin Ali RA","Ahmedabad");add(11,27,"Urs Mubarak, 49th al-Dai al-Mutlaq Syedna Mohammed Burhanuddin bin Abdulhusain RA","Surat");add(11,27,"Urs Ganje Shohoda","Ahmednagar");
 // Look up every occasion on a given Gregorian date via its Hijri equivalent.
 function eventsOnDate(ts){const hj=gregToHijri(ts);return hj?(E[hj.month+"-"+hj.day]||[]):[];}
+// Seeded with just ONE created jaman event, matching how the real system starts: the
+// family page should only ever show events the admin has actually created, never the
+// full Fatemi calendar. As the admin creates more from the calendar, they'll appear
+// here too (see createFromPicked/createCustom) and the family page will list all of them.
 const evs=[
-{id:1,name:"Jumu'ah Niyaz",venue:"Masjid, Main Hall",meal:"Lunch",start:G(2026,10,9),src:"custom"},
-{id:2,name:"Shab-e-Baraat Majlis Jaman",venue:"Masjid, Main Hall",meal:"Dinner",start:G(2027,1,21),src:"calendar"},
-{id:3,name:"Milad Amirul Mumineen Jaman",venue:"Masjid, Ground Floor",meal:"Dinner",start:G(2026,12,21),src:"calendar"},
-{id:4,name:"Milad Mubarak Jaman — al-Dai al-Ajal TUS",venue:"Masjid, Main Hall",meal:"Dinner",start:G(2027,2,28),src:"calendar"}
+{id:1,name:"Jumu'ah Niyaz",venue:"Masjid, Main Hall",meal:"Lunch",start:G(2026,10,9),src:"custom"}
 ];
-let nextId=5;
-const resp={1:{"10345678":{m:4,g:0},"10567890":{m:6,g:1},"10789012":{m:7,g:0}},2:{"10234567":{m:5,g:0},"10678901":{m:3,g:0}},3:{"10456789":{m:2,g:0},"10901234":{m:5,g:2}},4:{}};
-const actual={1:62,2:null,3:null,4:null};
+let nextId=2;
+const resp={1:{"10345678":{m:4,g:0},"10567890":{m:6,g:1},"10789012":{m:7,g:0}}};
+const actual={1:62};
 const log=[];
 const S={tab:"fam",step:"login",its:null,err:"",fails:0,lock:0,edit:null,per:8,buf:10,ev:1,
   showCustom:false,picked:[],hijY:1448,hijM:3,selDate:G(2026,10,9)};
@@ -371,13 +399,18 @@ function calendarGrid(){
   const startDow=new Date(anchor).getDay();
   const todayKey=dkey(now);
   const jamanByDay={};evs.forEach(e=>{(jamanByDay[dkey(e.start)]=jamanByDay[dkey(e.start)]||[]).push(e)});
-  let cells="";
+  let cells="",prevGMonth=null;
   for(let i=0;i<startDow;i++)cells+=`<div class="day pad"></div>`;
   for(let day=1;day<=len;day++){
     const ts=anchor+(day-1)*D,k=dkey(ts);
     const occ=eventsOnDate(ts),jaman=jamanByDay[k]||[];
     const sel=S.selDate&&dkey(S.selDate)===k;
-    const gLabel=new Date(ts).toLocaleDateString("en-IN",{day:"numeric",month:"short"});
+    const gd=new Date(ts),gMonth=gd.getMonth();
+    // Show the Gregorian day alone most of the time (never wraps); only add the short
+    // month name on the day it actually changes, so a phone-width cell never has to
+    // wrap "12 Sept" onto a second line and spill into the row below it.
+    const gLabel=gMonth!==prevGMonth?gd.toLocaleDateString("en-IN",{day:"numeric",month:"short"}):String(gd.getDate());
+    prevGMonth=gMonth;
     cells+=`<div class="day${k===todayKey?' today':''}${sel?' sel':''}" onclick="pickDay(${ts})">
 <span class="dn">${day}</span><span class="hj">${gLabel}</span><span class="dots">${occ.length?'<span class="dot dot-cal"></span>':""}${jaman.length?'<span class="dot dot-cu"></span>':""}</span></div>`;
   }
