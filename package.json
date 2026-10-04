@@ -1,0 +1,10 @@
+{
+  "name": "jamaat-jaman-rsvp-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Demo RSVP system for masjid jaman (food) planning — ITS-based family login, Hijri/Fatemi calendar, admin dashboard, and a kitchen-only view.",
+  "scripts": {
+    "dev": "npx serve . -l 3000"
+  },
+  "license": "UNLICENSED"
+}

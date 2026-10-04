@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jaman RSVP</title>
+<style>
+:root{
+  --bg:#f2efe6;--card:#ffffff;--ink:#1c2430;--mute:#6b7280;--line:#e3ddcc;
+  --navy:#0e2a4a;--navy2:#153a63;--gold:#c9a227;--gold2:#e3c767;--tan:#b08d4f;
+  --ok:#1f7a4d;--bad:#b3261e;--soft:#eef1f5;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#10151c;--card:#1a212c;--ink:#e9ecf1;--mute:#9aa4b2;--line:#2b3440;
+  --navy:#0b1f38;--navy2:#13335a;--gold:#e0b749;--gold2:#f0cf7a;--tan:#c9a05a;
+  --ok:#5fc98a;--bad:#f0918a;--soft:#17202c}}
+:root[data-theme="dark"]{--bg:#10151c;--card:#1a212c;--ink:#e9ecf1;--mute:#9aa4b2;--line:#2b3440;--navy:#0b1f38;--navy2:#13335a;--gold:#e0b749;--gold2:#f0cf7a;--tan:#c9a05a;--ok:#5fc98a;--bad:#f0918a;--soft:#17202c}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,"Segoe UI",Roboto,Mulish,sans-serif}
+.wrap{max-width:780px;margin:0 auto;padding:16px}
+h2,h3{margin:0 0 6px;line-height:1.25}
+h2{font-size:20px;font-weight:800}h3{font-size:15px;font-weight:800}
+p{margin:0 0 10px}.mute{color:var(--mute)}.sm{font-size:13px}
+header{background:var(--navy);color:#fff;border-bottom:3px solid var(--gold)}
+header .in{max-width:780px;margin:0 auto;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px}
+.brand .mark{width:30px;height:30px;flex:none}
+.brand b{font-size:17px;letter-spacing:.04em;color:#fff;font-weight:800}
+.brand small{display:block;color:var(--gold2);font-size:11px;letter-spacing:.05em}
+.tabs{display:flex;gap:4px}
+.tabs button{background:none;border:none;color:var(--gold2);font-weight:700;font-size:13px;letter-spacing:.03em;text-transform:uppercase;padding:6px 10px;cursor:pointer;border-bottom:3px solid transparent}
+.tabs button[aria-pressed="true"]{color:#fff;border-bottom-color:var(--gold)}
+.datebar{background:var(--card);border-bottom:1px solid var(--line);padding:7px 16px;font-size:12.5px;color:var(--mute)}
+.datebar .in{max-width:780px;margin:0 auto;display:flex;justify-content:space-between}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;margin-bottom:12px;overflow:hidden}
+.band{background:var(--navy);background-image:repeating-linear-gradient(135deg,rgba(255,255,255,.04) 0 2px,transparent 2px 14px);color:var(--gold2);font-weight:800;text-transform:uppercase;letter-spacing:.05em;font-size:12.5px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.band span.t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cardbody{padding:14px 16px}
+.badge2{background:rgba(255,255,255,.14);color:#fff;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px;text-transform:none;letter-spacing:0;white-space:nowrap}
+.hero{position:relative;border-radius:10px;overflow:hidden;margin-bottom:14px;padding:46px 16px 0;
+  background:linear-gradient(180deg,#8fb9d6 0%,#cdd8d9 35%,#e9cdab 62%,#f3e3cf 100%)}
+:root[data-theme="dark"] .hero,@media (prefers-color-scheme:dark){.hero{background:linear-gradient(180deg,#1c3350 0%,#33475a 35%,#5a4a38 62%,#241d14 100%)}}
+.hero svg.arch{display:block;width:100%;height:90px}
+.heroin{position:relative;z-index:2;max-width:360px;margin:-30px auto 0;background:rgba(255,255,255,.82);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.7);border-radius:10px;padding:26px 22px 22px;text-align:center;box-shadow:0 14px 34px rgba(0,0,0,.18)}
+:root[data-theme="dark"] .heroin{background:rgba(20,26,36,.82);border-color:rgba(255,255,255,.12)}
+.heroin .mark{width:46px;height:46px;margin-bottom:8px}
+.heroin h1{font-family:Georgia,"Times New Roman",serif;font-size:16px;letter-spacing:.09em;color:var(--navy);margin:0 0 18px;font-weight:700;text-transform:uppercase}
+:root[data-theme="dark"] .heroin h1{color:var(--gold2)}
+.fieldtag{display:inline-block;background:var(--tan);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:4px;margin:0 0 -9px 10px;position:relative;z-index:2;letter-spacing:.02em}
+input[type=text],input[type=number],input[type=date],input[type=time],select{width:100%;padding:12px;font:inherit;font-size:16px;border:1.5px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+.heroin input{background:#fff;text-align:center;letter-spacing:.06em;font-weight:700}
+input:focus,select:focus,button:focus-visible{outline:3px solid var(--gold);outline-offset:1px}
+button.p,button.s,button.tan{padding:11px 16px;font:inherit;font-weight:700;border-radius:6px;cursor:pointer;border:1.5px solid var(--navy)}
+button.p{background:var(--navy);color:#fff}button.s{background:transparent;color:var(--navy)}
+button.tan{background:var(--tan);color:#fff;border-color:var(--tan)}
+button.p:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:130px}
+.err{color:var(--bad);font-size:13px;margin-top:8px}.warn{color:var(--tan);font-size:13px;margin-top:6px}
+.chip{display:inline-block;padding:4px 10px;margin:3px 4px 0 0;background:var(--soft);border:1px solid var(--line);border-radius:99px;font-size:12.5px;cursor:pointer;color:var(--ink)}
+.chip.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.badge{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:700}
+.b-ok{background:var(--soft);color:var(--ok)}.b-lock{background:var(--soft);color:var(--mute)}.b-open{background:var(--soft);color:var(--tan)}
+.meta{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;font-size:14px;margin:0 0 12px}.meta dt{color:var(--mute)}.meta dd{margin:0}
+.rec{background:var(--soft);border-radius:6px;padding:12px}
+.big{font-weight:800;font-size:40px;line-height:1;color:var(--navy)}
+:root[data-theme="dark"] .big{color:var(--gold2)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:12px}
+.stats .card{margin:0;text-align:center}.stats .cardbody{padding:14px 10px}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:420px}
+th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line)}th{color:var(--mute);font-weight:700}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--navy);color:#fff;padding:10px 18px;border-radius:99px;font-weight:700;z-index:9}
+label{font-weight:700;font-size:13px;display:block;margin-bottom:4px}
+.gap-up{color:var(--bad)}.gap-down{color:var(--ok)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal .dow{text-align:center;font-size:11px;color:var(--mute);font-weight:700;padding:4px 0}
+.cal .day{aspect-ratio:1;border:1px solid var(--line);border-radius:6px;padding:4px;font-size:12px;cursor:pointer;background:var(--bg);display:flex;flex-direction:column;gap:2px;min-height:42px}
+.cal .day.pad{visibility:hidden}
+.cal .day.sel{border-color:var(--gold);border-width:2px;background:var(--soft)}
+.cal .day.today{box-shadow:inset 0 0 0 1px var(--navy)}
+.cal .dn{font-weight:700}
+.cal .hj{font-size:9.5px;color:var(--tan);font-weight:600}
+.cal .dots{display:flex;gap:2px;flex-wrap:wrap}
+.dot{width:6px;height:6px;border-radius:50%}
+.dot-cal{background:var(--gold)}.dot-cu{background:var(--tan)}
+.calnav{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.calnav button{background:none;border:none;font-size:20px;color:var(--navy);cursor:pointer;padding:2px 10px;font-weight:700}
+.cookday{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.cookday:last-child{border-bottom:none}
+hr.div{border:none;border-top:1px solid var(--line);margin:12px 0}
+</style>
+</head>
+<body>
+<header><div class="in">
+<div class="brand">
+<svg class="mark" viewBox="0 0 48 48"><path d="M24 2c2 4 1 7-1 9-3 3-6 6-6 11 0 5 4 9 7 9s7-4 7-9c0-5-3-8-6-11-2-2-3-5-1-9z" fill="none" stroke="#e3c767" stroke-width="2"/><circle cx="24" cy="24" r="3" fill="#e3c767"/><path d="M10 34h28l-3 8H13z" fill="none" stroke="#e3c767" stroke-width="2"/></svg>
+<div><b>JAMAN RSVP</b><small>Masjid Food Planning · Demo</small></div>
+</div>
+<div class="tabs" role="group" aria-label="View">
+<button id="t-fam" aria-pressed="true" onclick="tab('fam')">Family</button>
+<button id="t-adm" aria-pressed="false" onclick="tab('adm')">Admin</button>
+<button id="t-cook" aria-pressed="false" onclick="tab('cook')">Cook</button>
+</div>
+</div></header>
+<div class="datebar"><div class="in"><span id="todaystr"></span><span>Hyderabad Jamaat</span></div></div>
+<main class="wrap" id="app"></main>
+<div id="toast" class="toast" hidden></div>
+<script>
+const H=36e5,D=24*H,now=Date.now();
+$=id=>document.getElementById(id);
+$("todaystr").textContent=new Date(now).toLocaleDateString("en-IN",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+const at=(d,h,m)=>{const x=new Date(now+d*D);x.setHours(h,m||0,0,0);return x.getTime()};
+const fams=[
+["10234567","Mohammed bhai Saifee","Tolichowki",5],["10345678","Abbas bhai Nalwala","Banjara Hills",4],
+["10456789","Fatema ben Kapadia","Mehdipatnam",2],["10567890","Husain bhai Lokhandwala","Tolichowki",6],
+["10678901","Taher bhai Ujjaini","Attapur",3],["10789012","Yusuf bhai Bhopalwala","Banjara Hills",7],
+["10890123","Zainab ben Rangwala","Malakpet",4],["10901234","Ali Asgar bhai Dahodwala","Mehdipatnam",5]
+].map(([its,name,sector,size])=>({its,name,sector,size}));
+
+// Real Hijri month-start anchors + lengths, spanning the CURRENT Hijri year (1448) and
+// the following one (1449). The 1449 anchors are transcribed from the ITS app's own
+// Calendar > Events screens (the screenshots you shared). The 1448 anchors are derived
+// backward from that same chain using the app's month lengths, then pinned exactly to
+// today: 3 Oct 2026 = 22nd Rabi al-Akhar 1448 (as given) — so "today" lands correctly
+// inside the calendar instead of the calendar starting a year ahead of real life.
+const G=(y,m,d)=>new Date(y,m-1,d,12).getTime(); // y, m(1-12), d -> ts at noon local
+const hijriMonths=["Moharram al-Haram","Safar al-Muzaffar","Rabi al-Awwal","Rabi al-Akhar","Jamada al-Ula","Jamada al-Ukhra","Rajab al-Asab","Shaban al-Karim","Ramazan al-Moazzam","Shawwal al-Mukarram","Zilqadatil Haram","Zilhijjatil Haram"];
+const hijriLens1448=[30,29,30,29,30,29,30,29,30,29,30,30]; // 1448 is a leap year (30-day Zilhijja) — confirmed by chaining exactly into 1449's Moharram start below
+const hijriLens1449=[30,29,30,29,30,29,30,29,30,29,30,29];
+const hijriAnchors1448=[G(2026,6,15),G(2026,7,15),G(2026,8,13),G(2026,9,12),G(2026,10,11),G(2026,11,10),G(2026,12,9),G(2027,1,8),G(2027,2,6),G(2027,3,8),G(2027,4,6),G(2027,5,6)];
+const hijriAnchors1449=[G(2027,6,5),G(2027,7,5),G(2027,8,3),G(2027,9,2),G(2027,10,1),G(2027,10,31),G(2027,11,29),G(2027,12,29),G(2028,1,27),G(2028,2,26),G(2028,3,26),G(2028,4,25)];
+const hijriYears=[{y:1448,anchors:hijriAnchors1448,lens:hijriLens1448},{y:1449,anchors:hijriAnchors1449,lens:hijriLens1449}];
+function gregToHijri(ts){
+  const d=new Date(ts).setHours(12,0,0,0);
+  for(const yr of hijriYears)for(let i=0;i<12;i++){const s=yr.anchors[i],e=s+yr.lens[i]*D;if(d>=s&&d<e)return{year:yr.y,month:i,day:Math.round((d-s)/D)+1};}
+  return null;
+}
+// Full set of occasions transcribed from your screenshots (the ITS app's Calendar >
+// Events tab for Hijri 1449), keyed by Hijri month+day rather than a fixed Gregorian
+// date — since Urs/milad anniversaries recur on the same Hijri day every year, this one
+// table works for 1448, 1449, or any year we have anchors for. Nothing from the
+// screenshots is left out, including the minor local Urs entries.
+const E={};
+function add(m,d,n,loc){(E[m+"-"+d]=E[m+"-"+d]||[]).push({n,loc});}
+add(0,1,"Pehli Taarikh Mubarak (Shehre Moharramul Haram)");add(0,1,"Urs Maulai Abdullah Saheb AQ","Khambhat");
+add(0,2,"Urs Syedi Khanji Feer Saheb AQ","Udaipur");add(0,2,"Urs Maulai Raj Bin Maulai Hasan Saheb","Ahmedabad");
+add(0,3,"3rd Shehre Moharramul Haram");add(0,4,"4th Shehre Moharramul Haram");add(0,5,"5th Shehre Moharramul Haram");
+add(0,6,"6th Shehre Moharramul Haram");add(0,6,"Urs Syedi Mohammed Bin Qazikhan","Kapadvanj");
+add(0,7,"7th Shehre Moharramul Haram");add(0,7,"Urs Mubarak, 38th al-Dai al-Mutlaq Syedna Ismail Badruddin RA","Jamnagar");
+add(0,8,"8th Shehre Moharramul Haram");add(0,9,"9th Shehre Moharramul Haram");add(0,9,"Lailate Ashura");
+add(0,10,"Urs Mubarak, 1st al-Dai al-Mutlaq Syedna Zoeb bin Moosa RA","Haus, Yemen");add(0,10,"Urs Maulai Ahmed Saheb AQ","Khambhat");add(0,10,"Yaume Ashura","Karbala");
+add(0,14,"Urs Maulai Lukmanji bin Mulla Alibhai Saheb AQ","Wankaner");
+add(0,16,"Urs Mubarak, 3rd al-Dai al-Mutlaq Syedna Hatim bin Syedna Ibrahim RA","Hutaib Mubarak, Yemen");
+add(0,17,"Urs Mulla Mohammedali bin Syedi Najam Khan","Pune");add(0,17,"Urs Maulai Masud bin Sulaiman","Dhrangdhra");add(0,17,"Urs Saat Shaheed Sahebo","Mujpur");add(0,17,"Urs Mubarak, 39th al-Dai al-Mutlaq Syedna Ibrahim Vajihuddin RA","Ujjain");
+add(0,18,"Urs Ganipeer Shaheed Ibne Dawoodji AQ","Kalavad");
+add(0,23,"Urs Noor Bibi Umme Syedna Yusuf Najmuddin","Dandigam");add(0,23,"Urs Fatema Bibi Ukhte Syedna Yusuf Najmuddin","Dandigam");add(0,23,"Urs Syedi Hasanfeer Shaheed AQ","Denmal");
+add(0,24,"Urs Syedi Dada Sulemanji","Bundi, Kota");add(0,27,"Urs Syedi Fakhruddin Shaheed AQ","Taherabad, Galiyakot");
+add(0,28,"Urs Syedi Musanji bin Taj AQ","Baroda");add(0,29,"Urs Maulai Hasan Bin Maulai Adam AQ","Ahmedabad");
+add(1,1,"Pehli Taarikh Mubarak (Safarul Muzaffar)");add(1,1,"Urs Mubarak, 10th al-Dai al-Mutlaq Syedna Ali bin Syedi Husain RA","Sanaa, Yemen");
+add(1,3,"Urs Mubarak, 18th al-Dai al-Mutlaq Syedna Ali Shamsuddin bin Syedna Abdullah RA","Shareka, Yemen");
+add(1,4,"Urs Mubarak, 41st al-Dai al-Mutlaq Syedna Abduttaiyeb Zakiyuddin RA","Burhanpur");
+add(1,6,"Urs Syedi Abdeali Imaduddin bin Shaikh Jeeva bhai AQ","Surat");add(1,8,"Urs Syedna al-Khattab bin Hasan al-Hamdani AQ","Yemen");
+add(1,9,"Urs Syedi Tayyeb bs Zainuddin bin Syedna Mohammed Burhanuddin AQ","Surat");add(1,12,"Urs Syedna Ahmed Hamiduddin Kirmani RA","Misr");
+add(1,13,"Urs Maulai Adam bin Sulaimanji AQ","Ahmedabad");add(1,14,"Urs Kaka Akela - Kaki Akela","Khambhat");add(1,14,"Urs Maulai Nooh Saheb AQ","Selavi");
+add(1,15,"Urs Syedi Hamza bhai bin Syedi Qasim Khan AQ","Surat");add(1,16,"16mi Darees");
+add(1,17,"Urs Shaikh Ibrahim Saheb Shaheed AQ","Chechat");add(1,17,"Urs Maulai Shaikh Saheb bin Sulaimanji AQ","Ahmedabad");add(1,17,"Urs Khwaja Mohammed bin Ishaq AQ");add(1,17,"Urs Shaikh Abdullah Saheb Shaheed AQ","Chechat");
+add(1,20,"Chehlum Imam Husain SA","Karbala");add(1,22,"Urs Mubarak, 8th al-Dai al-Mutlaq Syedna Husain bin Syedna Ali RA","Sanaa, Yemen");
+add(1,27,"Urs Mubarak, 23rd al-Dai al-Mutlaq Syedna Mohammed Ezzuddin RA","Zabeed, Yemen");add(1,28,"Shahadat Imam Hasan SA","Madina");add(1,29,"Urs Syedi Hasan Zakiyuddin","Surat");
+add(2,1,"Pehli Taarikh Mubarak (Rabiul Awwal)");add(2,1,"Urs Syedi Shaikh Adam Safiyuddin bin Syedna Abduttaiyeb Zakiyuddin AQ","Jamnagar");
+add(2,2,"Urs Mubarak, 29th al-Dai al-Mutlaq Syedna Abduttaiyeb Zakiyuddin bin Syedna Dawood RA","Ahmedabad");
+add(2,4,"Urs Syedi Habibullah bin Mulla Adamji Bin Syedi Bawa Mulla Khan Saheb AQ","Ujjain");add(2,7,"Urs Syedi Shaikh Dawood bhai Mulla Mehmoodji","Udaipur");
+add(2,9,"Urs Syedi Abdeali Mohiyuddin bin Syedna Abdulhusain Husamuddin AQ","Surat");add(2,10,"Urs Mubarak, 50th al-Dai al-Mutlaq Syedna Abdullah Badruddin RA","Surat");
+add(2,12,"Eid e Milad un Nabi SAW");add(2,12,"Urs Ummul Mumineen Amatullah Aaisaheba AQ","London");add(2,12,"Urs Mubarak, 6th al-Dai al-Mutlaq Syedna Ali bin Hanzala RA","Yemen");
+add(2,14,"Urs Syedi Miyaji Mulla Taj Saheb AQ","Umreth");add(2,16,"Urs Mubarak, 52nd al-Dai al-Mutlaq Syedna Mohammed Burhanuddin RA","Mumbai");
+add(2,22,"Urs Maulai Dawood bin Maulai Raj Saheb AQ","Morbi");add(2,23,"Urs Syedi Qazi Khan bin Ameen Shah AQ","Halvad");add(2,23,"Urs Maulai Raj Saheb bin Maulai Dawood AQ","Morbi");
+add(2,25,"Urs Mubarak, 30th al-Dai al-Mutlaq Syedna Ali Shamsuddin bin Maulai Hasan RA","Hisne Afeda, Yemen");add(2,28,"Urs Mohammed bin Hasan Saheb","Dhinoj");
+add(3,1,"Pehli Taarikh Mubarak (Rabiul Akhar)");add(3,4,"Milad Imam uz-Zaman SA");
+add(3,5,"Urs Miyasaheb Motabhai bin Mulla Noor bhai","Balasinor");add(3,5,"Urs Miyasaheb Taiyebji bin Syedi Shaikh Shamas Khan","Balasinor");
+add(3,8,"Urs Maulai Raj bin Mulla Adam Saheb AQ","Jamnagar");add(3,10,"Urs Syedi Abdulrasool Shaheed AQ","Banswara");
+add(3,14,"Urs Syedi Ismailji Shaheed bin Syedi Abde Moosa AQ","Godhra");add(3,16,"Urs Mubarak, 25th al-Dai al-Mutlaq Syedna Jalal Shamsuddin bin Hasan RA","Ahmedabad");add(3,16,"16mi Darees");
+add(3,20,"Milad Mubarak, 52nd al-Dai al-Mutlaq Syedna Mohammed Burhanuddin RA","Mumbai");
+add(3,22,"Urs Syedi Mulla Habibullah bin Shaikh Sultanali","Bharuch");add(3,22,"Urs Mubarak, 36th al-Dai al-Mutlaq Syedna Moosa Kalimuddin bin Syedna Khanji RA","Jamnagar");
+add(3,27,"Urs Mubarak, 26th al-Dai al-Mutlaq Syedna Dawood Burhanuddin bin Ajabshah RA","Ahmedabad");add(3,28,"Urs Kakaji Mulla Esa bhai","Partapghar");
+add(4,1,"Pehli Taarikh Mubarak (Jamadal Ula)");add(4,1,"Urs Syedna Ahmed al-Mukarram RA","Yemen");add(4,3,"Urs Syedi Qazi Khan bin Ali AQ","Sidhpur");
+add(4,8,"Urs Syedi Mulla Wahid bhaisaheb bin Mulla Ibrahimji AQ","Surat");add(4,10,"Shahadat Maulatena Fatema tuz Zahra AS","Madina");
+add(4,11,"Urs Maulai Nooruddin Saheb AQ","Dongaon");add(4,15,"Urs Maulai Dawood bin Qazi Ahmed Saheb","Ahmedabad");add(4,16,"16mi Darees");
+add(4,17,"Urs Syedi Dawood bhaisaheb Shehabuddin","Surat");add(4,21,"Urs Seth Chanda bhai ibne Karim bhai","Mumbai");add(4,23,"Urs Mulla Jaferji Jiwaji","Amreli");
+add(5,1,"Pehli Taarikh Mubarak (Jamadal Ukhra)");add(5,8,"Urs Syedi Luqmanji bin Mulla Habibullah AQ","Surat");
+add(5,12,"Urs Mulla Tayyeb Bawa bin Mulla Ibrahimji","Ranala");add(5,14,"Urs Ganje Shohoda","Ahmedabad");
+add(5,15,"Urs Mubarak, 27th al-Dai al-Mutlaq Syedna Dawood Burhanuddin bin Qutub Shah RA","Ahmedabad");add(5,15,"Urs Maulai Ali bhai Shaheed","Kamlapur, Indore");add(5,16,"16mi Darees");
+add(5,18,"Urs Maulai Burhanuddin Ibne Khoj Khan","Pisawada");add(5,18,"Urs Maulai Adam ibne Maulai Dawood AQ","Jamnagar");add(5,18,"Urs Mubarak, 42nd al-Dai al-Mutlaq Syedna Yusuf Najmuddin RA","Surat");
+add(5,23,"Urs Mubarak, 34th al-Dai al-Mutlaq Syedna Ismail Badruddin bin Maulai Raj RA","Jamnagar");
+add(5,27,"Urs Syedna Lamaq bin Malik RA","Lahab, Yemen");add(5,27,"Urs Mubarak, 32nd al-Dai al-Mutlaq Syedna Qutub Khan Qutbuddin Shaheed RA","Ahmedabad");
+add(5,28,"Urs Syedna Yahya bin Syedna Lamak RA","Lahab, Yemen");add(5,28,"Urs Mubarak, 7th al-Dai al-Mutlaq Syedna Ahmed bin Mubarak RA","Hamdaan, Yemen");
+add(5,29,"Urs Mubarak, 46th al-Dai al-Mutlaq Syedna Mohammed Badruddin RA","Surat");add(5,29,"Urs Ajab Busaheba binte Syedna Qutbuddin Shaheed AQ","Ahmedabad");add(5,29,"Fadhil Raat, Pehli Raat Washeq");add(5,29,"Urs Syedna Qazi Noman bin Mohammed RA","Misr");
+add(6,1,"Pehli Taarikh Mubarak (Shehre Rajabul Asab)");add(6,1,"Pehli Tarikh Rozu");add(6,2,"Urs bhaiji bhai Ibne Qazi bhai","Karachi");
+add(6,4,"Urs Mubarak, 37th al-Dai al-Mutlaq Syedna Noor Mohammed Nooruddin RA","Mandvi, Kutch");add(6,4,"Urs Syedi Hasanji Badshah AQ","Ujjain");
+add(6,7,"Urs Mubarak, 28th al-Dai al-Mutlaq Syedna Shaikh Adam Safiyuddin RA","Ahmedabad");add(6,8,"Syedi Shaikh Adam Safiyuddin Bin Syedna Abduttaiyeb Zakiyuddin AQ","Jamnagar");
+add(6,11,"Urs Maulai Raj bin Maulai Dawood Bin Mohammed Soni Shaheed AQ","Ahmedabad");add(6,12,"Urs Syedi Najam Khan bin Syedna Feer Khan Shujauddin AQ","Aurangabad");
+add(6,13,"Milad Amirul Mumineen, Maulana Ali ibne Abitalib SA");add(6,13,"Ayyam ul Beez Rozu");
+add(6,14,"Ayyam ul Beez Rozu");add(6,14,"Urs Maulai Yaqub Saheb AQ","Patan");add(6,14,"Urs Mubarak, 14th al-Dai al-Mutlaq Syedna Abdulmuttalib Najmuddin bin Syedna Mohammed RA","Zamarmar, Yemen");
+add(6,15,"Ayyam ul Beez Rozu & Salaat uz Zawal");add(6,16,"16mi Darees");add(6,17,"Ayyamul Barakatil Khuldiyah");
+add(6,18,"Urs Mubarak, 13th al-Dai al-Mutlaq Syedna Ali Shamsuddin bin Syedna Ibrahim bin Husain RA","Hisne Afeda, Yemen");add(6,18,"Ayyamul Barakatil Khuldiyah");
+add(6,19,"Urs Mubarak, 51st al-Dai al-Mutlaq Syedna Taher Saifuddin RA","Mumbai");add(6,19,"Ayyamul Barakatil Khuldiyah");
+add(6,24,"Urs Syedi Qamruddin bs bin Syedna Hebatullah Al-Moayyad Fid-Deen AQ","Ujjain");add(6,24,"Urs Aminji Shaheed","Paddhari");
+add(6,26,"Lailate Maeraj");add(6,26,"Urs Mubarak, 47th al-Dai al-Mutlaq Syedna Abdulqadir Najmuddin RA","Ujjain");
+add(6,27,"Urs Syedi Miyasaheb Alibhai bin Peerji","Radhanpur");add(6,27,"Yaumul Mab'as Shareef (Moti us Sawalat) Rozu");add(6,29,"Urs Syedi Luqmanji bin Syedi Dawood bhai AQ","Udaipur");
+add(7,1,"Pehli Taarikh Mubarak (Shabanul Karim)");add(7,1,"Urs Mubarak, 40th al-Dai al-Mutlaq Syedna Hebatullah al-Moayyad Fiddeen RA","Ujjain");
+add(7,14,"Lailat un Nisf (Shab-e-Baraat)");add(7,15,"Urs Mubarak, 20th al-Dai al-Mutlaq Syedna Hasan Badruddin RA","Masaar, Yemen");
+add(7,16,"Urs Mubarak, 2nd al-Dai al-Mutlaq Syedna Ibrahim bin Husain RA","Hamdaan, Yemen");add(7,16,"16mi Darees");
+add(7,19,"Urs Syedi Saleh bhaisaheb Safiyuddin","Mumbai");
+add(7,22,"Urs Syedi Shaikhfir bin Dawood Shaheed","Ranpur");add(7,22,"Urs Syedi Shaikh Valibhai bin Shaikh Habibullah","Parda");add(7,22,"Urs Mubarak, Maulatena Hurratul Maleka RA","Zi Jibla, Yemen");
+add(7,25,"Urs Syedi Shams Khan bin Syedi Yusufji AQ","Surat");add(7,27,"Urs Mubarak, 5th al-Dai al-Mutlaq Syedna Ali bin Maula Mohammed bin Waleed RA","Agmoor, Yemen");add(7,29,"Urs Syedi Jiwanji bin Shaikh Dawood bhai AQ","Burhanpur");
+add(8,1,"Pehli Taarikh Mubarak (Shehre Ramazanul Moazzam)");add(8,1,"Urs Shaikh Dawood bhaisaheb","Dhinoj");
+add(8,2,"Urs Syedi Shaikh Feer Jamaluddin AQ bin Mulla Mohammed Ali AQ","Jamnagar");add(8,3,"Urs Syedi Tayyeb bhaisaheb Zainuddin bin Syedna Abdulqadir Najmuddin AQ","Surat");
+add(8,8,"Urs Syedi Fazal bhaisaheb Qutbuddin bin Syedna Abdullah Badruddin AQ","Surat");add(8,9,"Urs Mubarak, 16th al-Dai al-Mutlaq Syedna Abdullah Fakhruddin bin Ali RA","Zamarmar, Yemen");
+add(8,16,"Urs Syedi Hebatullah Jamaluddin AQ","Jamnagar");add(8,16,"16mi Darees");add(8,16,"Layali Fazela, 17mi Raat");add(8,18,"Layali Fazela, 19mi Raat");
+add(8,19,"Shahadat Amirul Mumineen, Maulana Ali ibne Abitalib SA","Kufa");add(8,19,"Urs Mubarak, 44th al-Dai al-Mutlaq Syedna Mohammed Ezzuddin bin Syedi Jiwanji RA","Surat");
+add(8,20,"Layali Fazela, 21mi Raat");add(8,21,"Shahadat Amirul Mumineen, Maulana Ali ibne Abitalib SA");add(8,22,"Lailatul Qadr");
+add(8,23,"Milad Mubarak, al-Dai al-Ajal Syedna Abu Jafarussadiq Aali Qadar Mufaddal Saifuddin TUS");add(8,23,"23rd Ramazan");
+add(8,29,"Lailate Salaseen (30mi Raat)");add(8,30,"Lailatul Eid ul-Fitr (Takbira)");
+add(9,1,"Pehli Taarikh Mubarak (Shawwalul Mukarram)");add(9,1,"Eid ul-Fitr (Takbira: Fajr, Zohar)");
+add(9,3,"Urs Shahzadi Sakina Bensaheba binte Syedna Taher Saifuddin RA","Mumbai");add(9,4,"Urs Syedi Yusufji Shaheed AQ","Ahmedabad");add(9,4,"Urs Syedi Taiyebji Shaheed AQ","Ahmedabad");
+add(9,5,"Urs Syedi Abdul Qadir Hakimuddin AQ");add(9,6,"Urs Mubarak, 17th al-Dai al-Mutlaq Syedna Hasan Badruddin bin Syedna Abdullah Fakhruddin RA","Zamarmar, Yemen");
+add(9,7,"Urs Syedna Mohammed bin Taher RA","Yemen");add(9,8,"Urs Mubarak, 15th al-Dai al-Mutlaq Syedna Abbas bin Syedna Mohammed bin Hatim RA","Hisne Afeda, Yemen");
+add(9,9,"Urs Mubarak, 31st al-Dai al-Mutlaq Syedna Qasim Khan Zainuddin RA","Ahmedabad");
+add(9,10,"Urs Syedna Hebatullah Al-Moayyad Shirazi RA","Misr");add(9,10,"Urs Mubarak, 21st al-Dai al-Mutlaq Syedna Husain Husamuddin RA","Masaar, Yemen");add(9,10,"Urs Mubarak, 11th al-Dai al-Mutlaq Syedna Ibrahim bin Syedna Husain RA","Hisne Afeda, Yemen");
+add(9,13,"Urs Syedi Aminji bin Jalal AQ","Ahmedabad");add(9,16,"16mi Darees");add(9,24,"Urs Shaikh Qutub bhai bin Sulaimanji","Pune");
+add(9,25,"Urs Syedi Abde Moosa Kalimuddin Bin Syedna Ismail Badruddin AQ","Jamnagar");add(9,27,"Urs Miyasaheb Abdeali Waliullah","Jaora");add(9,27,"Urs Syedi Abdul Qadir Hakimuddin AQ","Burhanpur");
+add(9,29,"Urs Syedi Bawa Mulla Khan Saheb bin Syedi Habibullah AQ","Rampura");add(9,29,"Urs Syedi Qasim Khan bin Syedi Hamza bhai AQ");add(9,29,"Urs Mulla Salehbhai Ibne Najamkhan","Ahmedabad");
+add(10,1,"Pehli Taarikh Mubarak (Zilqadatil Haram)");add(10,7,"Syedi Abdulqadir Hakimuddin bin Syedna Abduttaiyeb Zakiyuddin AQ","Surat");
+add(10,8,"Syedi Shaikh Adam Safiyuddin Bin Syedna Noor Mohammed Nooruddin AQ","Mandvi, Kutch");add(10,9,"Urs Mubarak, 33rd al-Dai al-Mutlaq Syedna Feer Khan Shujauddin RA","Ahmedabad");
+add(10,11,"Urs Syedna Ali bin Mohammed Sulaihi RA","Yemen");add(10,11,"Urs Syedi Hasan bin Nooh Bharuchi","Masaar, Yemen");
+add(10,12,"Urs Mubarak, 35th al-Dai al-Mutlaq Syedna Abduttaiyeb Zakiyuddin bin Syedna Mohammed RA","Jamnagar");add(10,12,"Urs Mubarak, 43rd al-Dai al-Mutlaq Syedna Abdeali Saifuddin RA","Surat");
+add(10,13,"Urs Mubarak, 9th al-Dai al-Mutlaq Syedna Ali bin Syedna Husain RA","Sanaa, Yemen");
+add(10,15,"Urs Mubarak, 45th al-Dai al-Mutlaq Syedna Tayyeb Zainuddin bin Syedi Jiwanji RA","Surat");add(10,15,"Urs Bai Saheba Rani Baisaheba binte Syedna Ismail Badruddin AQ","Mundra");add(10,16,"16mi Darees");
+add(10,19,"Urs Mubarak, 19th al-Dai al-Mutlaq Syedna Idris Imaduddin RA","Shibaam, Yemen");add(10,19,"Salgirah, Mazoon ud-Dawat Dr. Syedi Qaidjoher bs Ezzuddin Saheb DM");
+add(10,20,"Urs Syedi Mulla Valibhai Shaheed bin Syedi Jiwanji AQ","Aurangabad");add(10,21,"Urs Mubarak, 22nd al-Dai al-Mutlaq Syedna Ali Shamsuddin RA","Masaar, Yemen");
+add(10,22,"Urs Syedi Shaikh Sadiq Ali Saheb AQ","Surat");add(10,25,"Urs Mubarak, 4th al-Dai al-Mutlaq Syedna Ali Shamsuddin bin Syedna Husain RA","Sanaa, Yemen");
+add(10,27,"Urs Syedi Yusuf Khan bin Syedi Shamas Khan","Shajapur");add(10,27,"Milad Mubarak, 51st al-Dai al-Mutlaq Syedna Taher Saifuddin RA","Mumbai");
+add(11,1,"Pehli Taarikh Mubarak (Zilhijjatil Haram)");add(11,1,"Urs Mubarak, 12th al-Dai al-Mutlaq Syedna Mohammed bin Syedi Hatim bin Syedna Husain RA","Hisne Afeda, Yemen");
+add(11,6,"Urs Syedi Khoj bin Malak","Kaparwanj");add(11,9,"Yawm ul-Arafa, Takbira and Washeq");add(11,10,"Eid ul-Adha (Takbira)");
+add(11,11,"Takbira");add(11,12,"Takbira");add(11,13,"Takbira (Zohar & Asr)");add(11,13,"Urs Maulai Firoz bin Ismail AQ","Ahmedabad");
+add(11,15,"Milad, Ummul Mumineen Amatullah Aaisaheba AQ","London");
+add(11,16,"Urs Mubarak, 24th al-Dai al-Mutlaq Syedna Yusuf Najmuddin bin Sulaimanji RA","Taiba, Yemen");add(11,16,"Urs Syedi Ishaq bhaisaheb Jamaluddin RA","Mumbai");add(11,16,"16mi Darees");
+add(11,18,"Eid e Gadheer e Khum (Rozu)");
+add(11,27,"Urs Mubarak, 48th al-Dai al-Mutlaq Syedna Abdulhusain Husamuddin bin Ali RA","Ahmedabad");add(11,27,"Urs Mubarak, 49th al-Dai al-Mutlaq Syedna Mohammed Burhanuddin bin Abdulhusain RA","Surat");add(11,27,"Urs Ganje Shohoda","Ahmednagar");
+// Look up every occasion on a given Gregorian date via its Hijri equivalent.
+function eventsOnDate(ts){const hj=gregToHijri(ts);return hj?(E[hj.month+"-"+hj.day]||[]):[];}
+const evs=[
+{id:1,name:"Jumu'ah Niyaz",venue:"Masjid, Main Hall",meal:"Lunch",start:G(2026,10,9),src:"custom"},
+{id:2,name:"Shab-e-Baraat Majlis Jaman",venue:"Masjid, Main Hall",meal:"Dinner",start:G(2027,1,21),src:"calendar"},
+{id:3,name:"Milad Amirul Mumineen Jaman",venue:"Masjid, Ground Floor",meal:"Dinner",start:G(2026,12,21),src:"calendar"},
+{id:4,name:"Milad Mubarak Jaman — al-Dai al-Ajal TUS",venue:"Masjid, Main Hall",meal:"Dinner",start:G(2027,2,28),src:"calendar"}
+];
+let nextId=5;
+const resp={1:{"10345678":{m:4,g:0},"10567890":{m:6,g:1},"10789012":{m:7,g:0}},2:{"10234567":{m:5,g:0},"10678901":{m:3,g:0}},3:{"10456789":{m:2,g:0},"10901234":{m:5,g:2}},4:{}};
+const actual={1:62,2:null,3:null,4:null};
+const log=[];
+const S={tab:"fam",step:"login",its:null,err:"",fails:0,lock:0,edit:null,per:8,buf:10,ev:1,
+  showCustom:false,picked:[],hijY:1448,hijM:3,selDate:G(2026,10,9)};
+const fam=its=>fams.find(f=>f.its===its);
+const dt=t=>new Date(t).toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"short",year:"numeric"});
+const tm=t=>new Date(t).toLocaleTimeString("en-IN",{hour:"numeric",minute:"2-digit"});
+const dtm=t=>dt(t)+", "+tm(t);
+const dkey=t=>{const d=new Date(t);return d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate()};
+const isOpen=e=>Date.now()<e.start-D;
+const tot=r=>r.m+r.g; // members (from the home) + mehmaan (guests visiting Hyderabad)
+const card=(title,body,badge="")=>`<div class="card"><div class="band"><span class="t">${title}</span>${badge?`<span class="badge2">${badge}</span>`:""}</div><div class="cardbody">${body}</div></div>`;
+function tab(t){S.tab=t;$("t-fam").setAttribute("aria-pressed",t==="fam");$("t-adm").setAttribute("aria-pressed",t==="adm");$("t-cook").setAttribute("aria-pressed",t==="cook");render()}
+function toast(m){const t=$("toast");t.textContent=m;t.hidden=false;setTimeout(()=>t.hidden=true,2200)}
+function fill(i){$("its").value=i}
+function login(){
+  const v=$("its").value.trim();
+  if(Date.now()<S.lock){S.err="Too many wrong attempts. Please wait a few seconds and try again.";return render()}
+  const f=fam(v);
+  if(!f){S.fails++;
+    if(S.fails>=5){S.lock=Date.now()+20000;S.fails=0;S.err="Too many wrong attempts. Please wait 20 seconds."}
+    else S.err="This ITS is not registered as a Head of Family. Please ask your HOF to respond.";
+    return render()}
+  S.err="";S.fails=0;S.its=v;S.step="confirm";render()
+}
+function out(){S.its=null;S.step="login";S.edit=null;render()}
+function chk(id){
+  const m=+$("m"+id).value||0,f=fam(S.its);
+  // Only members (household count) gets the typo check — mehmaan are guests and
+  // naturally vary, so they shouldn't trigger a "that looks too high" warning.
+  $("w"+id).textContent=(m>f.size+4)?`You entered ${m} members, but your household is usually ${f.size}. Please double-check.`:"";
+}
+function save(id){
+  const m=Math.max(0,parseInt($("m"+id).value)||0),g=Math.max(0,parseInt($("g"+id).value)||0),f=fam(S.its);
+  const old=resp[id][S.its];
+  log.unshift({t:Date.now(),name:f.name,its:S.its,ev:evs.find(e=>e.id===id).name,from:old?tot(old):null,to:m+g});
+  resp[id][S.its]={m,g};S.edit=null;render();toast(old?"Response updated":"Response recorded");
+}
+const archSvg=`<svg class="arch" viewBox="0 0 600 90" preserveAspectRatio="none"><path d="M0,90 L0,55 Q25,15 50,55 L50,90 Z M50,90 L50,55 Q75,15 100,55 L100,90Z M100,90L100,55Q125,15 150,55L150,90Z M150,90L150,55Q175,15 200,55L200,90Z M200,90L200,55Q225,15 250,55L250,90Z M250,90L250,55Q275,15 300,55L300,90Z M300,90L300,55Q325,15 350,55L350,90Z M350,90L350,55Q375,15 400,55L400,90Z M400,90L400,55Q425,15 450,55L450,90Z M450,90L450,55Q475,15 500,55L500,90Z M500,90L500,55Q525,15 550,55L550,90Z M550,90L550,55Q575,15 600,55L600,90Z" fill="#0e2a4a" opacity=".55"/></svg>`;
+const markSvg=`<svg class="mark" viewBox="0 0 48 48"><path d="M24 2c2 4 1 7-1 9-3 3-6 6-6 11 0 5 4 9 7 9s7-4 7-9c0-5-3-8-6-11-2-2-3-5-1-9z" fill="none" stroke="var(--navy)" stroke-width="2"/><circle cx="24" cy="24" r="3" fill="var(--navy)"/><path d="M10 34h28l-3 8H13z" fill="none" stroke="var(--navy)" stroke-width="2"/></svg>`;
+function famView(){
+  if(S.step==="login"){
+    return `<div class="hero">${archSvg}<div class="heroin">${markSvg}<h1>Jamaat Jaman RSVP</h1>
+<span class="fieldtag">ITS ID</span>
+<input type="text" id="its" inputmode="numeric" maxlength="8" placeholder="Enter your ITS ID" autocomplete="off" onkeydown="if(event.key==='Enter')login()">
+<div class="err" role="alert">${S.err}</div>
+<p style="margin-top:14px"><button class="tan" style="width:100%" onclick="login()">Continue</button></p></div></div>
+${card("Demo helper",`<p class="mute sm">Tap a sample HOF ITS to fill it in. Any other number shows the "not registered" message.</p>${fams.map(f=>`<span class="chip" onclick="fill('${f.its}')">${f.its}</span>`).join("")}`)}`;
+  }
+  const f=fam(S.its);
+  if(S.step==="confirm"){
+    return `<div class="hero">${archSvg}<div class="heroin">${markSvg}<h1>Welcome</h1>
+<p style="font-size:18px;font-weight:800;color:var(--navy);margin:-10px 0 2px">${f.name}</p>
+<p class="mute sm" style="margin-bottom:16px">Is this you? Please confirm before continuing.</p>
+<div class="row"><button class="p" onclick="S.step='events';render()">Yes, this is me</button><button class="s" onclick="out()">No, go back</button></div></div></div>`;
+  }
+  return `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px">
+<div><h2 style="margin:0">${f.name}</h2><span class="mute sm">ITS ${f.its}</span></div><button class="s" onclick="out()">Sign out</button></div>
+<p class="mute sm">Enter the total number of people from your home who will come. You can change it until 24 hours before each event.</p>`
+  +evs.slice().sort((a,b)=>a.start-b.start).map(e=>{
+    const r=resp[e.id][S.its],open=isOpen(e),form=(!r&&open)||S.edit===e.id;
+    const badge=r?"Recorded":open?"Pending":"Closed";
+    const body=`<dl class="meta"><dt>Date</dt><dd>${dt(e.start)}</dd><dt>Time</dt><dd>${tm(e.start)}</dd><dt>Venue</dt><dd>${e.venue}</dd><dt>Meal</dt><dd>${e.meal}</dd><dt>Edits close</dt><dd>${dtm(e.start-D)}</dd></dl>`
+    +(form?`<div class="row"><div><label for="m${e.id}">Members (from your home)</label><input type="number" min="0" id="m${e.id}" value="${r?r.m:f.size}" oninput="chk(${e.id})"></div>
+<div><label for="g${e.id}">Mehmaan (guests visiting Hyderabad)</label><input type="number" min="0" id="g${e.id}" value="${r?r.g:0}" oninput="chk(${e.id})"></div></div>
+<div class="warn" id="w${e.id}"></div><p class="mute sm" style="margin-top:8px">Enter 0 in both if your family will not attend.</p>
+<div class="row"><button class="p" onclick="save(${e.id})">${r?"Save changes":"Submit response"}</button>${r?`<button class="s" onclick="S.edit=null;render()">Cancel</button>`:""}</div>`
+    :r?`<div class="rec"><b>${tot(r)===0?"Not attending":tot(r)+" from your home will attend"}</b><br><span class="mute sm">${r.m} members${r.g?`, ${r.g} mehmaan`:""}</span></div>
+${open?`<p style="margin:10px 0 0"><button class="s" onclick="S.edit=${e.id};render()">Change count</button></p>`:`<p class="mute sm" style="margin:8px 0 0">Responses are locked. Please contact the masjid office for changes.</p>`}`
+    :`<p class="mute sm">Responses closed for this event. Please contact the masjid office.</p>`);
+    return card(e.name,body,badge);
+  }).join("");
+}
+
+// ---- Admin: calendar + event creation ----
+function navMonth(d){
+  let m=S.hijM+d,y=S.hijY;
+  if(m<0){m=11;y--}if(m>11){m=0;y++}
+  if(!hijriYears.find(o=>o.y===y))return; // only 1448 and 1449 are in range
+  S.hijM=m;S.hijY=y;render();
+}
+function pickDay(ts){S.selDate=ts;S.picked=[];S.showCustom=false;render()}
+function toggleOcc(i){const p=S.picked,x=p.indexOf(i);x===-1?p.push(i):p.splice(x,1);render()}
+function createFromPicked(){
+  const occ=eventsOnDate(S.selDate),chosen=S.picked.map(i=>occ[i]).filter(Boolean);
+  if(!chosen.length)return;
+  const name=chosen.map(o=>o.n).join(" & ");
+  const t=$("cf-time").value||"13:00",venue=$("cf-venue").value.trim()||"Masjid, Main Hall",meal=$("cf-meal").value.trim()||"Lunch";
+  const [hh,mm]=t.split(":").map(Number);
+  const start=new Date(S.selDate);start.setHours(hh,mm,0,0);
+  const id=nextId++;
+  evs.push({id,name,venue,meal,start:start.getTime(),src:"calendar"});
+  resp[id]={};actual[id]=null;S.picked=[];S.ev=id;render();toast("Jaman event created");
+}
+function createCustom(){
+  const name=$("cu-name").value.trim(),t=$("cu-time").value,venue=$("cu-venue").value.trim(),meal=$("cu-meal").value.trim();
+  if(!name||!t||!venue){toast("Please fill in name, time and venue");return}
+  const [hh,mm]=t.split(":").map(Number);
+  const start=new Date(S.selDate);start.setHours(hh,mm,0,0);
+  const id=nextId++;
+  evs.push({id,name,venue,meal:meal||"—",start:start.getTime(),src:"custom"});
+  resp[id]={};actual[id]=null;S.showCustom=false;S.ev=id;render();toast("Custom event created");
+}
+function saveActual(id){const v=$("act").value;actual[id]=v===""?null:Math.max(0,parseInt(v)||0);render();toast("Actual attendance saved")}
+
+function calendarGrid(){
+  // The Hijri month is the primary grid now — it starts wherever its anchor date falls in
+  // the week, runs for its real 29 or 30 days, and the Gregorian date rides along inside
+  // each cell as the small sub-label. A Hijri month almost always spans parts of two
+  // Gregorian months (e.g. Jamada al-Ula runs 11 Oct – 9 Nov), which is expected and correct.
+  const yd=hijriYears.find(o=>o.y===S.hijY),mIdx=S.hijM;
+  const anchor=yd.anchors[mIdx],len=yd.lens[mIdx];
+  const startDow=new Date(anchor).getDay();
+  const todayKey=dkey(now);
+  const jamanByDay={};evs.forEach(e=>{(jamanByDay[dkey(e.start)]=jamanByDay[dkey(e.start)]||[]).push(e)});
+  let cells="";
+  for(let i=0;i<startDow;i++)cells+=`<div class="day pad"></div>`;
+  for(let day=1;day<=len;day++){
+    const ts=anchor+(day-1)*D,k=dkey(ts);
+    const occ=eventsOnDate(ts),jaman=jamanByDay[k]||[];
+    const sel=S.selDate&&dkey(S.selDate)===k;
+    const gLabel=new Date(ts).toLocaleDateString("en-IN",{day:"numeric",month:"short"});
+    cells+=`<div class="day${k===todayKey?' today':''}${sel?' sel':''}" onclick="pickDay(${ts})">
+<span class="dn">${day}</span><span class="hj">${gLabel}</span><span class="dots">${occ.length?'<span class="dot dot-cal"></span>':""}${jaman.length?'<span class="dot dot-cu"></span>':""}</span></div>`;
+  }
+  const gStart=new Date(anchor),gEnd=new Date(anchor+(len-1)*D);
+  const fmt=(d,withYear)=>d.toLocaleDateString("en-IN",{day:"numeric",month:"short",year:withYear?"numeric":undefined});
+  const gSpan=gStart.getFullYear()===gEnd.getFullYear()?`${fmt(gStart,false)} – ${fmt(gEnd,true)}`:`${fmt(gStart,true)} – ${fmt(gEnd,true)}`;
+  const monthLabel=`${hijriMonths[mIdx]} ${S.hijY}`;
+  const body=`${["S","M","T","W","T","F","S"].map(d=>`<div class="dow">${d}</div>`).join("")}`;
+  return card(`<span style="display:flex;align-items:center;justify-content:space-between;width:100%"><button onclick="navMonth(-1)" style="background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:0 6px">‹</button><span style="text-align:center"><span class="t" style="display:block">${monthLabel}</span><span style="display:block;font-size:10.5px;color:var(--gold2);text-transform:none;letter-spacing:0;font-weight:600">${gSpan}</span></span><button onclick="navMonth(1)" style="background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:0 6px">›</button></span>`,
+  `<div class="cal">${body}${cells}</div><p class="mute sm" style="margin-top:10px"><span class="dot dot-cal" style="display:inline-block"></span> Fatemi calendar occasion(s) &nbsp; <span class="dot dot-cu" style="display:inline-block"></span> Jaman already created</p>`);
+}
+
+function dayPanel(){
+  if(!S.selDate)return card("Select a date",`<p class="mute">Tap a date on the calendar above to see what falls on it.</p>`);
+  const occ=eventsOnDate(S.selDate);
+  const occBody=occ.length?
+    `<p class="mute sm">Everything on this date from the Fatemi calendar. Tick the occasion(s) this jaman is for — select one, or more than one if they share the same meal.</p>`+
+    occ.map((o,i)=>`<label style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line);cursor:pointer">
+<input type="checkbox" style="margin-top:3px;width:18px;height:18px;flex:none" ${S.picked.includes(i)?"checked":""} onchange="toggleOcc(${i})">
+<span><span style="font-weight:700">${o.n}</span>${o.loc?`<br><span class="mute sm">@ ${o.loc}</span>`:""}</span></label>`).join("")
+    :`<p class="mute">No occasions from the Fatemi calendar fall on ${dt(S.selDate)}.</p>`;
+  const occCard=card(`Occasions on ${dt(S.selDate)}`,occBody);
+
+  const pickedForm=S.picked.length?card("Create jaman event",`
+<p class="mute sm">Creating a jaman for: <b>${S.picked.map(i=>occ[i]?.n).filter(Boolean).join(" & ")}</b></p>
+<div class="row"><div><label for="cf-time">Time</label><input type="time" id="cf-time" value="13:00"></div>
+<div><label for="cf-venue">Venue</label><input type="text" id="cf-venue" placeholder="Masjid, Main Hall"></div></div>
+<label for="cf-meal" style="margin-top:10px">Meal</label><input type="text" id="cf-meal" placeholder="Lunch / Dinner / Niyaz">
+<p style="margin-top:12px"><button class="p" onclick="createFromPicked()">Create jaman event</button></p>`):"";
+
+  const customToggle=`<p style="margin:${occ.length?"-2px":"0"} 0 0"><button class="s" onclick="S.showCustom=!S.showCustom;render()">${S.showCustom?"Cancel custom event":"+ Custom event (not on the calendar)"}</button></p>`;
+  const customForm=S.showCustom?card("Custom event",`
+<p class="mute sm">For a majlis, guest lecture, or anything not on the Fatemi calendar.</p>
+<label for="cu-name">Event name</label><input type="text" id="cu-name" placeholder="e.g. Hafiz-ul-Quran Majlis">
+<div class="row" style="margin-top:10px"><div><label for="cu-time">Time</label><input type="time" id="cu-time"></div>
+<div><label for="cu-venue">Venue</label><input type="text" id="cu-venue" placeholder="Masjid, Main Hall"></div></div>
+<label for="cu-meal" style="margin-top:10px">Meal (optional)</label><input type="text" id="cu-meal" placeholder="Lunch / Dinner / Niyaz — leave blank if none">
+<p style="margin-top:12px"><button class="p" onclick="createCustom()">Create event</button></p>`):"";
+
+  const k=dkey(S.selDate),dayEvs=evs.filter(e=>dkey(e.start)===k).sort((a,b)=>a.start-b.start);
+  const createdBlock=dayEvs.length?dayEvs.map(e=>{
+    const expanded=S.ev===e.id;
+    const body=`<span class="mute sm">${tm(e.start)} · ${e.venue}</span>`
+    +(expanded?eventDashboard(e):`<p class="mute sm" style="margin-top:8px"><button class="s" onclick="S.ev=${e.id};render()">View RSVP details →</button></p>`);
+    return card(e.name,body,e.src==="calendar"?"Calendar":"Custom");
+  }).join(""):"";
+
+  return occCard+pickedForm+customToggle+customForm+createdBlock;
+}
+
+function eventDashboard(e){
+  const R=resp[e.id],rows=Object.values(R);
+  const M=rows.reduce((s,r)=>s+r.m,0),G=rows.reduce((s,r)=>s+r.g,0),T=M+G;
+  const cook=Math.ceil(T*(1+S.buf/100)/S.per);
+  const act=actual[e.id],gap=act!=null?act-T:null,gapPct=act!=null&&T>0?Math.round(gap/T*100):null;
+  return `<hr class="div">
+<div class="stats"><div class="card"><div class="cardbody"><div class="big" style="font-size:26px">${T}</div><div class="mute sm">RSVP'd</div></div></div>
+<div class="card"><div class="cardbody"><div class="big" style="font-size:26px">${cook}</div><div class="mute sm">Thaals (+${S.buf}%)</div></div></div>
+<div class="card"><div class="cardbody"><div class="big" style="font-size:26px">${rows.length}/${fams.length}</div><div class="mute sm">Households</div></div></div></div>
+<p class="mute sm" style="margin-top:-4px;margin-bottom:12px">${M} members · ${G} mehmaan</p>
+<div class="row"><div><label for="act">Actual attendance (after event)</label><input type="number" id="act" min="0" value="${act!=null?act:''}" placeholder="e.g. 70"></div>
+<div style="display:flex;align-items:flex-end"><button class="p" style="width:100%" onclick="saveActual(${e.id})">Save</button></div></div>
+${act!=null?`<p class="sm ${gap>0?'gap-up':gap<0?'gap-down':''}" style="margin-top:8px">Gap vs RSVP: ${gap>0?'+':''}${gap} (${gapPct>0?'+':''}${gapPct}%)</p>`:""}
+<p style="margin-top:10px"><button class="s" onclick="S.ev=null;render()">Collapse</button></p>`;
+}
+
+function adminView(){
+  return `<h2>Admin dashboard</h2><p class="mute sm">In the real system this page sits behind an admin login.</p>
+${calendarGrid()}${dayPanel()}
+${card("Thaal settings",`<p class="mute sm">Used across the calendar and the cook's view.</p><div class="row"><div><label for="per">People per thaal</label><input type="number" id="per" min="1" value="${S.per}" onchange="S.per=Math.max(1,+this.value||8);render()"></div>
+<div><label for="buf">Buffer for walk-ins (%)</label><input type="number" id="buf" min="0" value="${S.buf}" onchange="S.buf=Math.max(0,+this.value||0);render()"></div></div>`)}
+${card("Change log",log.length?`<div class="tw"><table><tr><th>Time</th><th>Event</th><th>Change</th></tr>${log.slice(0,8).map(l=>`<tr><td>${tm(l.t)}</td><td>${l.ev}</td><td>${l.from===null?"New: "+l.to:l.from+" → "+l.to}</td></tr>`).join("")}</table></div>`:`<p class="mute sm">No changes yet.</p>`)}`;
+}
+
+// ---- Cook view ----
+function cookView(){
+  const byDay={};
+  evs.forEach(e=>{const k=dkey(e.start);const R=resp[e.id];const t=Object.values(R).reduce((s,r)=>s+tot(r),0);
+    byDay[k]=byDay[k]||{date:e.start,total:0};byDay[k].total+=t;if(e.start<byDay[k].date)byDay[k].date=e.start});
+  const list=Object.values(byDay).filter(d=>d.date>now-D).sort((a,b)=>a.date-b.date);
+  const rows=list.length?list.map(d=>{
+    const cook=Math.ceil(d.total*(1+S.buf/100)/S.per);
+    return `<div class="cookday"><div><div style="font-weight:800;font-size:16px">${dt(d.date)}</div><div class="mute sm">${d.total} people RSVP'd</div></div><div style="text-align:right"><div class="big">${cook}</div><div class="mute sm">thaals</div></div></div>`;
+  }).join(""):`<p class="mute">No upcoming dates yet.</p>`;
+  return `<h2>Kitchen view</h2><p class="mute sm">Just the date and how many thaals to prepare — nothing else to track.</p>
+${card("Settings",`<div class="row"><div><label for="per2">People per thaal</label><input type="number" id="per2" min="1" value="${S.per}" onchange="S.per=Math.max(1,+this.value||8);render()"></div>
+<div><label for="buf2">Buffer %</label><input type="number" id="buf2" min="0" value="${S.buf}" onchange="S.buf=Math.max(0,+this.value||0);render()"></div></div>`)}
+${card("Upcoming thaal count",rows)}`;
+}
+
+function render(){$("app").innerHTML=S.tab==="fam"?famView():S.tab==="cook"?cookView():adminView()}
+render();
+</script>
+</body>
+</html>
