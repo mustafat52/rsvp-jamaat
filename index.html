@@ -39,13 +39,9 @@ header .in{max-width:780px;margin:0 auto;padding:12px 16px;display:flex;justify-
 .band span.t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cardbody{padding:14px 16px}
 .badge2{background:rgba(255,255,255,.14);color:#fff;font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:99px;text-transform:none;letter-spacing:0;white-space:nowrap}
-.hero{position:relative;border-radius:10px;overflow:hidden;margin-bottom:14px;padding:46px 16px 0;
-  background:linear-gradient(180deg,#8fb9d6 0%,#cdd8d9 35%,#e9cdab 62%,#f3e3cf 100%)}
-:root[data-theme="dark"] .hero,@media (prefers-color-scheme:dark){.hero{background:linear-gradient(180deg,#1c3350 0%,#33475a 35%,#5a4a38 62%,#241d14 100%)}}
-.hero svg.arch{display:block;width:100%;height:90px}
-.heroin{position:relative;z-index:2;max-width:360px;margin:-30px auto 0;background:rgba(255,255,255,.82);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.7);border-radius:10px;padding:26px 22px 22px;text-align:center;box-shadow:0 14px 34px rgba(0,0,0,.18)}
+.hero{position:relative;border-radius:10px;overflow:hidden;margin-bottom:14px;padding:48px 16px;background:#f4e8c8}
+.heroin{position:relative;z-index:2;max-width:360px;margin:0 auto;background:rgba(255,255,255,.82);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.7);border-radius:10px;padding:26px 22px 22px;text-align:center;box-shadow:0 14px 34px rgba(0,0,0,.18)}
 :root[data-theme="dark"] .heroin{background:rgba(20,26,36,.82);border-color:rgba(255,255,255,.12)}
-.heroin .mark{width:46px;height:46px;margin-bottom:8px}
 .heroin h1{font-family:Georgia,"Times New Roman",serif;font-size:16px;letter-spacing:.09em;color:var(--navy);margin:0 0 18px;font-weight:700;text-transform:uppercase}
 :root[data-theme="dark"] .heroin h1{color:var(--gold2)}
 .fieldtag{display:inline-block;background:var(--tan);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:4px;margin:0 0 -9px 10px;position:relative;z-index:2;letter-spacing:.02em}
@@ -119,17 +115,6 @@ html,body{overflow-x:hidden}
 </style>
 </head>
 <body>
-<header><div class="in">
-<div class="brand">
-<svg class="mark" viewBox="0 0 48 48"><path d="M24 2c2 4 1 7-1 9-3 3-6 6-6 11 0 5 4 9 7 9s7-4 7-9c0-5-3-8-6-11-2-2-3-5-1-9z" fill="none" stroke="#e3c767" stroke-width="2"/><circle cx="24" cy="24" r="3" fill="#e3c767"/><path d="M10 34h28l-3 8H13z" fill="none" stroke="#e3c767" stroke-width="2"/></svg>
-<div><b>JAMAN RSVP</b><small>Masjid Food Planning · Demo</small></div>
-</div>
-<div class="tabs" role="group" aria-label="View">
-<button id="t-fam" aria-pressed="true" onclick="tab('fam')">Family</button>
-<button id="t-adm" aria-pressed="false" onclick="tab('adm')">Admin</button>
-<button id="t-cook" aria-pressed="false" onclick="tab('cook')">Cook</button>
-</div>
-</div></header>
 <div class="datebar"><div class="in"><span id="todaystr"></span><span>Hyderabad Jamaat</span></div></div>
 <main class="wrap" id="app"></main>
 <div id="toast" class="toast" hidden></div>
@@ -296,7 +281,7 @@ const dkey=t=>{const d=new Date(t);return d.getFullYear()+"-"+d.getMonth()+"-"+d
 const isOpen=e=>Date.now()<e.start-D;
 const tot=r=>r.m+r.g; // members (from the home) + mehmaan (guests visiting Hyderabad)
 const card=(title,body,badge="")=>`<div class="card"><div class="band"><span class="t">${title}</span>${badge?`<span class="badge2">${badge}</span>`:""}</div><div class="cardbody">${body}</div></div>`;
-function tab(t){S.tab=t;$("t-fam").setAttribute("aria-pressed",t==="fam");$("t-adm").setAttribute("aria-pressed",t==="adm");$("t-cook").setAttribute("aria-pressed",t==="cook");render()}
+function tab(t){S.tab=t;render()}
 function toast(m){const t=$("toast");t.textContent=m;t.hidden=false;setTimeout(()=>t.hidden=true,2200)}
 function fill(i){$("its").value=i}
 function login(){
@@ -322,11 +307,9 @@ function save(id){
   log.unshift({t:Date.now(),name:f.name,its:S.its,ev:evs.find(e=>e.id===id).name,from:old?tot(old):null,to:m+g});
   resp[id][S.its]={m,g};S.edit=null;render();toast(old?"Response updated":"Response recorded");
 }
-const archSvg=`<svg class="arch" viewBox="0 0 600 90" preserveAspectRatio="none"><path d="M0,90 L0,55 Q25,15 50,55 L50,90 Z M50,90 L50,55 Q75,15 100,55 L100,90Z M100,90L100,55Q125,15 150,55L150,90Z M150,90L150,55Q175,15 200,55L200,90Z M200,90L200,55Q225,15 250,55L250,90Z M250,90L250,55Q275,15 300,55L300,90Z M300,90L300,55Q325,15 350,55L350,90Z M350,90L350,55Q375,15 400,55L400,90Z M400,90L400,55Q425,15 450,55L450,90Z M450,90L450,55Q475,15 500,55L500,90Z M500,90L500,55Q525,15 550,55L550,90Z M550,90L550,55Q575,15 600,55L600,90Z" fill="#0e2a4a" opacity=".55"/></svg>`;
-const markSvg=`<svg class="mark" viewBox="0 0 48 48"><path d="M24 2c2 4 1 7-1 9-3 3-6 6-6 11 0 5 4 9 7 9s7-4 7-9c0-5-3-8-6-11-2-2-3-5-1-9z" fill="none" stroke="var(--navy)" stroke-width="2"/><circle cx="24" cy="24" r="3" fill="var(--navy)"/><path d="M10 34h28l-3 8H13z" fill="none" stroke="var(--navy)" stroke-width="2"/></svg>`;
 function famView(){
   if(S.step==="login"){
-    return `<div class="hero">${archSvg}<div class="heroin">${markSvg}<h1>Jamaat Jaman RSVP</h1>
+    return `<div class="hero"><div class="heroin"><h1>Red Hills Jamaat Jaman RSVP</h1>
 <span class="fieldtag">ITS ID</span>
 <input type="text" id="its" inputmode="numeric" maxlength="8" placeholder="Enter your ITS ID" autocomplete="off" onkeydown="if(event.key==='Enter')login()">
 <div class="err" role="alert">${S.err}</div>
@@ -335,7 +318,7 @@ ${card("Demo helper",`<p class="mute sm">Tap a sample HOF ITS to fill it in. Any
   }
   const f=fam(S.its);
   if(S.step==="confirm"){
-    return `<div class="hero">${archSvg}<div class="heroin">${markSvg}<h1>Welcome</h1>
+    return `<div class="hero"><div class="heroin"><h1>Welcome</h1>
 <p style="font-size:18px;font-weight:800;color:var(--navy);margin:-10px 0 2px">${f.name}</p>
 <p class="mute sm" style="margin-bottom:16px">Is this you? Please confirm before continuing.</p>
 <div class="row"><button class="p" onclick="S.step='events';render()">Yes, this is me</button><button class="s" onclick="out()">No, go back</button></div></div></div>`;

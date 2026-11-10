@@ -86,6 +86,32 @@ set the source to the `main` branch root, and GitHub will publish
   but worth a quick cross-check against the live ITS app before relying
   on it for a real event.
 
+## Backend (Supabase)
+
+```
+supabase/
+  config.toml                         sign-ups off; family-login callable without a JWT
+  migrations/…_init_schema.sql        tables, RLS, 24h lock trigger, aggregate functions
+  seed.sql                            demo households + ITS import template + staff setup
+  seed_calendar.sql                   GENERATED Hijri months + Fatemi occasions
+  functions/family-login/             ITS login -> short-lived session token
+scripts/generate-calendar-seed.mjs    rebuilds seed_calendar.sql from index.html
+```
+
+Setup (once):
+
+1. Create a Supabase project. Authentication -> turn **sign-ups off**.
+2. `supabase link --project-ref <ref>` then `supabase db push` (runs the migration).
+3. Load data in the SQL editor: `seed_calendar.sql`, then your real households
+   (see `seed.sql`; delete the 8 demo families first).
+4. Create the admin and cook users in Authentication -> Users, then add them to
+   `public.profiles` (template at the bottom of `seed.sql`).
+5. `supabase secrets set FAMILY_JWT_SECRET=<Settings -> API -> JWT Secret> ALLOWED_ORIGIN=<your site>`
+6. `supabase functions deploy family-login`
+
+If the project uses the newer asymmetric JWT signing keys only, the legacy JWT secret must
+still be enabled for the family token to be accepted (otherwise sign with the project key instead).
+
 ## Next steps for a production version
 
 See the conversation this demo came from for the fuller discussion, but

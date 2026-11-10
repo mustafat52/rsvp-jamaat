@@ -1,0 +1,14 @@
+# Supabase CLI config (local dev + `supabase functions deploy`).
+# For the hosted project also switch these off in the dashboard: Authentication -> Sign In / Providers.
+project_id = "red-hills-jaman-rsvp"
+
+[auth]
+enable_signup = false          # staff accounts are created by hand; families never sign up
+
+[auth.email]
+enable_signup = false
+
+# Families have no Supabase Auth account: this function checks the ITS itself and mints the token,
+# so the platform must not demand a JWT to call it.
+[functions.family-login]
+verify_jwt = false
