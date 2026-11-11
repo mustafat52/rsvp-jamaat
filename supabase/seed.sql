@@ -33,8 +33,13 @@ on conflict (its_id) do nothing;
 --    People who leave the list: set is_active = false (keeps their past RSVPs):
 --    update public.households set is_active = false where its_id = '10234567';
 
--- C) STAFF — create the admin/cook users first in Authentication -> Users
---    (email + password, sign-ups disabled), then link them:
---    insert into public.profiles (user_id, role, display_name)
---    values ('<admin auth user uuid>', 'admin', 'Jamaat Admin'),
---           ('<cook auth user uuid>',  'cook',  'Kitchen');
+-- C) STAFF — admin / cook log in with their own ITS ID (no email account needed).
+--    The admin panel login is ITS 30464909.
+insert into public.staff (its_id, name, role) values
+  ('30464909', 'Jamaat Admin', 'admin')
+on conflict (its_id) do update set role = excluded.role, is_active = true;
+
+--    Add the kitchen login whenever you have their ITS:
+--    insert into public.staff (its_id, name, role) values ('XXXXXXXX', 'Kitchen', 'cook');
+--    Remove access instantly (works on already-issued sessions too):
+--    update public.staff set is_active = false where its_id = 'XXXXXXXX';

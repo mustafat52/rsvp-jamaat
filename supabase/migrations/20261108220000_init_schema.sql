@@ -4,11 +4,12 @@
 -- Who uses it
 --   family : logs in with an ITS ID only (no password). Reads their own
 --            household, reads events, creates/edits ONLY their own RSVPs.
---   admin  : Supabase Auth user (email login) listed in public.profiles.
---            Creates events, sets thaal settings, sees AGGREGATE counts only
---            (no family names, same as the demo's admin view).
---   cook   : Supabase Auth user listed in public.profiles. Can only call
---            cook_upcoming() -> date + thaal count. Nothing else.
+--   admin  : logs in with their own ITS ID (listed in public.staff, role 'admin')
+--            through the `staff-login` function. Creates events, sets thaal
+--            settings, sees AGGREGATE counts only (no family names, same as
+--            the demo's admin view).
+--   cook   : same login, role 'cook'. Can only call cook_upcoming() ->
+--            date + thaal count. Nothing else.
 --
 -- How family login works (no password, so it must never be done from the browser)
 --   Browser -> Edge Function `family-login` (uses service role) which:
@@ -21,6 +22,13 @@
 --            app_role:'family', exp: now()+12h }
 --   RLS below trusts those claims, so a family can only ever touch rows
 --   where its_id = their own ITS.
+--   Admin / cook login is the same idea through `staff-login`, which checks
+--   public.staff instead of public.households and mints:
+--          { role:'authenticated', sub:<staff.auth_id>, app_role:'admin'|'cook',
+--            staff_its:'30464909', exp: now()+8h }
+--   There is deliberately NO its_id claim on a staff token, so staff are never
+--   mistaken for a family. public.app_role() looks the staff row up on every
+--   request, so setting staff.is_active = false cuts access immediately.
 --   >>> In Supabase Auth settings, DISABLE public sign-ups. <<<
 -- =====================================================================
 
@@ -58,13 +66,16 @@ create table public.households (
 
 
 -- ---------------------------------------------------------------------
--- 3. Staff profiles (admins / cooks sign in via Supabase Auth)
+-- 3. Staff (admin / cook) — they log in with their own ITS ID
+--    No Supabase Auth account is needed. Managed with the service role / SQL editor.
 -- ---------------------------------------------------------------------
-create table public.profiles (
-  user_id       uuid primary key references auth.users(id) on delete cascade,
-  role          text not null check (role in ('admin', 'cook')),
-  display_name  text,
-  created_at    timestamptz not null default now()
+create table public.staff (
+  its_id      text primary key check (its_id ~ '^[0-9]{8}$'),
+  name        text not null check (length(btrim(name)) > 0),
+  role        text not null check (role in ('admin', 'cook')),
+  is_active   boolean not null default true,
+  auth_id     uuid not null unique default gen_random_uuid(),   -- becomes JWT "sub" for the staff session
+  created_at  timestamptz not null default now()
 );
 
 
@@ -108,7 +119,7 @@ create table public.events (
   hijri_day          smallint check (hijri_day between 1 and 30),
   actual_attendance  int check (actual_attendance >= 0),     -- entered by admin after the event
   is_cancelled       boolean not null default false,
-  created_by         uuid references auth.users(id) on delete set null,
+  created_by         uuid default auth.uid() references public.staff(auth_id) on delete set null,
   created_at         timestamptz not null default now(),
   updated_at         timestamptz not null default now()
 );
@@ -167,20 +178,22 @@ language sql stable as $$
   select nullif(auth.jwt() ->> 'its_id', '')
 $$;
 
--- 'admin' | 'cook' (profiles table) or 'family' (JWT claim) or null
+-- 'admin' | 'cook' (looked up live in public.staff, so deactivation is immediate)
+-- or 'family' (JWT claim, which can never grant staff rights) or null
 create or replace function public.app_role() returns text
 language sql stable security definer set search_path = public as $$
   select coalesce(
-    (select p.role from public.profiles p where p.user_id = auth.uid()),
-    auth.jwt() ->> 'app_role'
+    (select s.role from public.staff s where s.auth_id = auth.uid() and s.is_active),
+    case when auth.jwt() ->> 'app_role' = 'family' then 'family' end
   )
 $$;
 
+-- Always true/false, never NULL: a NULL here would slip through `if not is_admin() ...` checks.
 create or replace function public.is_admin() returns boolean
-language sql stable as $$ select public.app_role() = 'admin' $$;
+language sql stable as $$ select coalesce(public.app_role() = 'admin', false) $$;
 
 create or replace function public.is_cook() returns boolean
-language sql stable as $$ select public.app_role() in ('cook', 'admin') $$;
+language sql stable as $$ select coalesce(public.app_role() in ('cook', 'admin'), false) $$;
 
 -- true for the service role, the SQL editor and migrations
 create or replace function public.is_privileged() returns boolean
@@ -361,7 +374,7 @@ end $$;
 -- =====================================================================
 alter table public.settings           enable row level security;
 alter table public.households         enable row level security;
-alter table public.profiles           enable row level security;
+alter table public.staff              enable row level security;   -- no policies: service role only
 alter table public.hijri_months       enable row level security;
 alter table public.calendar_occasions enable row level security;
 alter table public.events             enable row level security;
@@ -378,10 +391,6 @@ create policy settings_admin_update on public.settings for update to authenticat
 -- (import and edits are done with the service role / SQL editor)
 create policy households_self_read on public.households for select to authenticated
   using (its_id = public.current_its());
-
--- profiles: staff can read their own row
-create policy profiles_self_read on public.profiles for select to authenticated
-  using (user_id = auth.uid());
 
 -- calendar: admin reads; writes via service role
 create policy hijri_admin_read on public.hijri_months       for select to authenticated using (public.is_admin());
@@ -413,7 +422,7 @@ alter default privileges in schema public revoke all on tables    from anon, aut
 alter default privileges in schema public revoke all on functions from anon, authenticated;
 alter default privileges in schema public revoke all on sequences from anon, authenticated;
 
-grant select                 on public.settings, public.households, public.profiles,
+grant select                 on public.settings, public.households,
                                 public.hijri_months, public.calendar_occasions to authenticated;
 grant update                 on public.settings to authenticated;
 grant select, insert, update, delete on public.events to authenticated;

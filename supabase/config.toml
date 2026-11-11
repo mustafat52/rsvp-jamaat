@@ -12,3 +12,6 @@ enable_signup = false
 # so the platform must not demand a JWT to call it.
 [functions.family-login]
 verify_jwt = false
+
+[functions.staff-login]
+verify_jwt = false
